@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dba239497852d0744b4c97c7aad202ed, type: 3}
+  m_Name: SelectionCursorAssets
+  m_EditorClassIdentifier: 
+  canvasAsset: {fileID: 6509719999306287040, guid: ee2a163a8f6bc3146a8e6bde1b351bdd,
+    type: 3}
+  eventSystemAsset: {fileID: 8984913999818831866, guid: 002bd9ce0f1626f43baac8a1efa7b880,
+    type: 3}
+  selectionCursorAsset: {fileID: 665543147333068175, guid: 4777ed070166a494c92dd0816f86132a,
+    type: 3}
