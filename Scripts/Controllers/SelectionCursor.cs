@@ -75,6 +75,31 @@ namespace SelectionCursorUI.Controllers
         private EventSystem eventSystem;
 
         /// <summary>
+        /// World corners
+        /// </summary>
+        private static Vector3[] worldCorners = new Vector3[4];
+
+        /// <summary>
+        /// Get center in world position
+        /// </summary>
+        /// <param name="rectTransform">Rectangle transform</param>
+        /// <returns>Center in world position</returns>
+        private static Vector3 GetCenterWorldPosition(RectTransform rectTransform)
+        {
+            Vector3 ret = Vector3.zero;
+            if (rectTransform != null)
+            {
+                rectTransform.GetWorldCorners(worldCorners);
+                foreach (Vector3 world_corner in worldCorners)
+                {
+                    ret += world_corner;
+                }
+                ret *= 0.25f;
+            }
+            return ret;
+        }
+
+        /// <summary>
         /// Hide
         /// </summary>
         private void Hide()
@@ -142,30 +167,27 @@ namespace SelectionCursorUI.Controllers
                 }
                 if (oldSelectedRectTransform != null)
                 {
-                    Vector2 offset = selectedRectTransform.rect.center * selectedRectTransform.localScale * 0.5f;
                     elapsedTransitionTime += (useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
                     if (elapsedTransitionTime >= transitionTime)
                     {
                         oldSelectedRectTransform = null;
                         elapsedTransitionTime = 0.0f;
                         rectTransform.sizeDelta = selectedRectTransform.sizeDelta + borderSize;
-                        rectTransform.position = new Vector3(selectedRectTransform.position.x + offset.x, selectedRectTransform.position.y + offset.y, selectedRectTransform.position.z);
+                        rectTransform.position = GetCenterWorldPosition(selectedRectTransform);
                         rectTransform.localScale = selectedRectTransform.localScale;
                     }
                     else
                     {
                         float time = transitionCurve.Evaluate((transitionTime > float.Epsilon) ? Mathf.Clamp(elapsedTransitionTime / transitionTime, 0.0f, 1.0f) : 1.0f);
-                        Vector2 old_offset = oldSelectedRectTransform.rect.center * oldSelectedRectTransform.localScale * 0.5f;
                         rectTransform.sizeDelta = Vector2.Lerp(oldSelectedRectTransform.sizeDelta + borderSize, selectedRectTransform.sizeDelta + borderSize, time);
-                        rectTransform.position = Vector3.Lerp(new Vector3(oldSelectedRectTransform.position.x + old_offset.x, oldSelectedRectTransform.position.y + old_offset.y, oldSelectedRectTransform.position.z), new Vector3(selectedRectTransform.position.x + offset.x, selectedRectTransform.position.y + offset.y, selectedRectTransform.position.z), time);
+                        rectTransform.position = Vector3.Lerp(GetCenterWorldPosition(oldSelectedRectTransform), GetCenterWorldPosition(selectedRectTransform), time);
                         rectTransform.localScale = Vector3.Lerp(oldSelectedRectTransform.localScale, selectedRectTransform.localScale, time);
                     }
                 }
                 else if (selectedRectTransform != null)
                 {
                     rectTransform.sizeDelta = selectedRectTransform.sizeDelta + borderSize;
-                    Vector2 center = selectedRectTransform.rect.center * selectedRectTransform.localScale * 0.5f;
-                    rectTransform.position = new Vector3(selectedRectTransform.position.x + center.x, selectedRectTransform.position.y + center.y, selectedRectTransform.position.z);
+                    rectTransform.position = GetCenterWorldPosition(selectedRectTransform);
                     rectTransform.localScale = selectedRectTransform.localScale;
                     if (image != null)
                     {
