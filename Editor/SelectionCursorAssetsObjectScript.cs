@@ -14,19 +14,19 @@ namespace SelectionCursorUI.Editor
         /// Canvas asset
         /// </summary>
         [SerializeField]
-        private GameObject canvasAsset;
+        private GameObject canvasAsset = default;
 
         /// <summary>
         /// Event system asset
         /// </summary>
         [SerializeField]
-        private GameObject eventSystemAsset;
+        private GameObject eventSystemAsset = default;
 
         /// <summary>
         /// Selection cursor asset
         /// </summary>
         [SerializeField]
-        private GameObject selectionCursorAsset;
+        private GameObject selectionCursorAsset = default;
 
         /// <summary>
         /// Canvas asset

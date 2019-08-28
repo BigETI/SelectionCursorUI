@@ -22,7 +22,7 @@ namespace SelectionCursorUI.Controllers
         /// Border size
         /// </summary>
         [SerializeField]
-        private Vector2 borderSize;
+        private Vector2 borderSize = default;
 
         /// <summary>
         /// Opacity
