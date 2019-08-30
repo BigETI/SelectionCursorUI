@@ -100,6 +100,16 @@ namespace SelectionCursorUI.Controllers
         }
 
         /// <summary>
+        /// Absolute local scale
+        /// </summary>
+        /// <param name="transform">Transform</param>
+        /// <returns>Absolute local scale</returns>
+        private static Vector2 AbsoluteLocalScale(RectTransform transform)
+        {
+            return new Vector2(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y));
+        }
+
+        /// <summary>
         /// Hide
         /// </summary>
         private void Hide()
@@ -172,23 +182,26 @@ namespace SelectionCursorUI.Controllers
                     {
                         oldSelectedRectTransform = null;
                         elapsedTransitionTime = 0.0f;
-                        rectTransform.sizeDelta = selectedRectTransform.sizeDelta + borderSize;
+                        //rectTransform.sizeDelta = selectedRectTransform.sizeDelta + borderSize;
+                        rectTransform.sizeDelta = (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize;
                         rectTransform.position = GetCenterWorldPosition(selectedRectTransform);
-                        rectTransform.localScale = selectedRectTransform.localScale;
+                        //rectTransform.localScale = selectedRectTransform.localScale;
                     }
                     else
                     {
                         float time = transitionCurve.Evaluate((transitionTime > float.Epsilon) ? Mathf.Clamp(elapsedTransitionTime / transitionTime, 0.0f, 1.0f) : 1.0f);
-                        rectTransform.sizeDelta = Vector2.Lerp(oldSelectedRectTransform.sizeDelta + borderSize, selectedRectTransform.sizeDelta + borderSize, time);
+                        //rectTransform.sizeDelta = Vector2.Lerp(oldSelectedRectTransform.sizeDelta + borderSize, selectedRectTransform.sizeDelta + borderSize, time);
+                        rectTransform.sizeDelta = Vector2.Lerp((oldSelectedRectTransform.sizeDelta * oldSelectedRectTransform.localScale) + borderSize, (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize, time);
                         rectTransform.position = Vector3.Lerp(GetCenterWorldPosition(oldSelectedRectTransform), GetCenterWorldPosition(selectedRectTransform), time);
-                        rectTransform.localScale = Vector3.Lerp(oldSelectedRectTransform.localScale, selectedRectTransform.localScale, time);
+                        //rectTransform.localScale = Vector3.Lerp(oldSelectedRectTransform.localScale, selectedRectTransform.localScale, time);
                     }
                 }
                 else if (selectedRectTransform != null)
                 {
-                    rectTransform.sizeDelta = selectedRectTransform.sizeDelta + borderSize;
+                    //rectTransform.sizeDelta = selectedRectTransform.sizeDelta + borderSize;
+                    rectTransform.sizeDelta = (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize;
                     rectTransform.position = GetCenterWorldPosition(selectedRectTransform);
-                    rectTransform.localScale = selectedRectTransform.localScale;
+                    //rectTransform.localScale = selectedRectTransform.localScale;
                     if (image != null)
                     {
                         image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
