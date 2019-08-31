@@ -147,32 +147,39 @@ namespace SelectionCursorUI.Controllers
                 }
                 else
                 {
-                    RectTransform selected_rect_transform = selected_game_object.GetComponent<RectTransform>();
-                    if (selected_rect_transform == null)
+                    if (selected_game_object.activeInHierarchy)
                     {
-                        Hide();
+                        RectTransform selected_rect_transform = selected_game_object.GetComponent<RectTransform>();
+                        if (selected_rect_transform == null)
+                        {
+                            Hide();
+                        }
+                        else
+                        {
+                            if (selectedRectTransform == null)
+                            {
+                                oldSelectedRectTransform = null;
+                                selectedRectTransform = selected_rect_transform;
+                                if (image != null)
+                                {
+                                    image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
+                                }
+                            }
+                            else if (selectedRectTransform.gameObject.GetInstanceID() != selected_game_object.GetInstanceID())
+                            {
+                                oldSelectedRectTransform = selectedRectTransform;
+                                selectedRectTransform = selected_rect_transform;
+                                elapsedTransitionTime = 0.0f;
+                                if (image != null)
+                                {
+                                    image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
+                                }
+                            }
+                        }
                     }
                     else
                     {
-                        if (selectedRectTransform == null)
-                        {
-                            oldSelectedRectTransform = null;
-                            selectedRectTransform = selected_rect_transform;
-                            if (image != null)
-                            {
-                                image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
-                            }
-                        }
-                        else if (selectedRectTransform.gameObject.GetInstanceID() != selected_game_object.GetInstanceID())
-                        {
-                            oldSelectedRectTransform = selectedRectTransform;
-                            selectedRectTransform = selected_rect_transform;
-                            elapsedTransitionTime = 0.0f;
-                            if (image != null)
-                            {
-                                image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
-                            }
-                        }
+                        Hide();
                     }
                 }
                 if (oldSelectedRectTransform != null)
@@ -182,26 +189,20 @@ namespace SelectionCursorUI.Controllers
                     {
                         oldSelectedRectTransform = null;
                         elapsedTransitionTime = 0.0f;
-                        //rectTransform.sizeDelta = selectedRectTransform.sizeDelta + borderSize;
                         rectTransform.sizeDelta = (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize;
                         rectTransform.position = GetCenterWorldPosition(selectedRectTransform);
-                        //rectTransform.localScale = selectedRectTransform.localScale;
                     }
                     else
                     {
                         float time = transitionCurve.Evaluate((transitionTime > float.Epsilon) ? Mathf.Clamp(elapsedTransitionTime / transitionTime, 0.0f, 1.0f) : 1.0f);
-                        //rectTransform.sizeDelta = Vector2.Lerp(oldSelectedRectTransform.sizeDelta + borderSize, selectedRectTransform.sizeDelta + borderSize, time);
                         rectTransform.sizeDelta = Vector2.Lerp((oldSelectedRectTransform.sizeDelta * oldSelectedRectTransform.localScale) + borderSize, (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize, time);
                         rectTransform.position = Vector3.Lerp(GetCenterWorldPosition(oldSelectedRectTransform), GetCenterWorldPosition(selectedRectTransform), time);
-                        //rectTransform.localScale = Vector3.Lerp(oldSelectedRectTransform.localScale, selectedRectTransform.localScale, time);
                     }
                 }
                 else if (selectedRectTransform != null)
                 {
-                    //rectTransform.sizeDelta = selectedRectTransform.sizeDelta + borderSize;
                     rectTransform.sizeDelta = (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize;
                     rectTransform.position = GetCenterWorldPosition(selectedRectTransform);
-                    //rectTransform.localScale = selectedRectTransform.localScale;
                     if (image != null)
                     {
                         image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
