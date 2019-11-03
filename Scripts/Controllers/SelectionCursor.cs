@@ -13,6 +13,12 @@ namespace SelectionCursorUI.Controllers
     public class SelectionCursor : MonoBehaviour
     {
         /// <summary>
+        /// Default color
+        /// </summary>
+        [SerializeField]
+        private Color defaultColor = Color.white;
+
+        /// <summary>
         /// Use unscaled time
         /// </summary>
         [SerializeField]
@@ -23,13 +29,6 @@ namespace SelectionCursorUI.Controllers
         /// </summary>
         [SerializeField]
         private Vector2 borderSize = default;
-
-        /// <summary>
-        /// Opacity
-        /// </summary>
-        [SerializeField]
-        [Range(0.0f, 1.0f)]
-        private float opacity = 1.0f;
 
         /// <summary>
         /// Transition time
@@ -55,9 +54,19 @@ namespace SelectionCursorUI.Controllers
         private RectTransform selectedRectTransform;
 
         /// <summary>
+        /// Selected color
+        /// </summary>
+        private SelectionColor selectedColor;
+
+        /// <summary>
         /// Old selected rectangle transform
         /// </summary>
         private RectTransform oldSelectedRectTransform;
+
+        /// <summary>
+        /// Old selected color
+        /// </summary>
+        private SelectionColor oldSelectedColor;
 
         /// <summary>
         /// Rectangle transform
@@ -80,6 +89,35 @@ namespace SelectionCursorUI.Controllers
         private static Vector3[] worldCorners = new Vector3[4];
 
         /// <summary>
+        /// Default color
+        /// </summary>
+        public Color DefaultColor
+        {
+            get => defaultColor;
+            set => defaultColor = value;
+        }
+
+        /// <summary>
+        /// Evaluated time
+        /// </summary>
+        public float EvaluatedTime => ((transitionCurve == null) ? ((transitionTime > float.Epsilon) ? Mathf.Clamp(elapsedTransitionTime / transitionTime, 0.0f, 1.0f) : 1.0f) : transitionCurve.Evaluate((transitionTime > float.Epsilon) ? Mathf.Clamp(elapsedTransitionTime / transitionTime, 0.0f, 1.0f) : 1.0f));
+
+        /// <summary>
+        /// Selection color
+        /// </summary>
+        public Color SelectionColor => ((selectedColor == null) ? defaultColor : selectedColor.Color);
+
+        /// <summary>
+        /// Old selection color
+        /// </summary>
+        public Color OldSelectionColor => ((oldSelectedColor == null) ? defaultColor : oldSelectedColor.Color);
+
+        /// <summary>
+        /// Cursor color
+        /// </summary>
+        public Color CursorColor => ((selectedRectTransform == null) ? Color.clear : ((oldSelectedRectTransform == null) ? SelectionColor : Color.Lerp(OldSelectionColor, SelectionColor, EvaluatedTime)));
+
+        /// <summary>
         /// Get center in world position
         /// </summary>
         /// <param name="rectTransform">Rectangle transform</param>
@@ -100,14 +138,11 @@ namespace SelectionCursorUI.Controllers
         }
 
         /// <summary>
-        /// Absolute local scale
+        /// Get size
         /// </summary>
         /// <param name="transform">Transform</param>
         /// <returns>Absolute local scale</returns>
-        private static Vector2 AbsoluteLocalScale(RectTransform transform)
-        {
-            return new Vector2(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y));
-        }
+        private Vector2 GetSize(RectTransform transform) => ((transform.rect.size * (new Vector2(Mathf.Abs(transform.localScale.x), Mathf.Abs(transform.localScale.y)))) + borderSize);
 
         /// <summary>
         /// Hide
@@ -115,12 +150,10 @@ namespace SelectionCursorUI.Controllers
         private void Hide()
         {
             selectedRectTransform = null;
+            selectedColor = null;
             oldSelectedRectTransform = null;
+            oldSelectedColor = null;
             elapsedTransitionTime = 0.0f;
-            if (image != null)
-            {
-                image.color = new Color(image.color.r, image.color.b, image.color.b, 0.0f);
-            }
         }
 
         /// <summary>
@@ -156,24 +189,21 @@ namespace SelectionCursorUI.Controllers
                         }
                         else
                         {
+                            SelectionColor selected_color = selected_rect_transform.GetComponent<SelectionColor>();
                             if (selectedRectTransform == null)
                             {
                                 oldSelectedRectTransform = null;
+                                oldSelectedColor = null;
                                 selectedRectTransform = selected_rect_transform;
-                                if (image != null)
-                                {
-                                    image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
-                                }
+                                selectedColor = selected_color;
                             }
                             else if (selectedRectTransform.gameObject.GetInstanceID() != selected_game_object.GetInstanceID())
                             {
                                 oldSelectedRectTransform = selectedRectTransform;
+                                oldSelectedColor = selectedColor;
                                 selectedRectTransform = selected_rect_transform;
+                                selectedColor = selected_color;
                                 elapsedTransitionTime = 0.0f;
-                                if (image != null)
-                                {
-                                    image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
-                                }
                             }
                         }
                     }
@@ -188,26 +218,27 @@ namespace SelectionCursorUI.Controllers
                     if (elapsedTransitionTime >= transitionTime)
                     {
                         oldSelectedRectTransform = null;
+                        oldSelectedColor = null;
                         elapsedTransitionTime = 0.0f;
-                        rectTransform.sizeDelta = (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize;
+                        rectTransform.sizeDelta = GetSize(selectedRectTransform);
                         rectTransform.position = GetCenterWorldPosition(selectedRectTransform);
                     }
                     else
                     {
-                        float time = transitionCurve.Evaluate((transitionTime > float.Epsilon) ? Mathf.Clamp(elapsedTransitionTime / transitionTime, 0.0f, 1.0f) : 1.0f);
-                        rectTransform.sizeDelta = Vector2.Lerp((oldSelectedRectTransform.sizeDelta * oldSelectedRectTransform.localScale) + borderSize, (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize, time);
+                        float time = EvaluatedTime;
+                        rectTransform.sizeDelta = Vector2.Lerp(GetSize(oldSelectedRectTransform), GetSize(selectedRectTransform), time);
                         rectTransform.position = Vector3.Lerp(GetCenterWorldPosition(oldSelectedRectTransform), GetCenterWorldPosition(selectedRectTransform), time);
                     }
                 }
                 else if (selectedRectTransform != null)
                 {
-                    rectTransform.sizeDelta = (selectedRectTransform.sizeDelta * AbsoluteLocalScale(selectedRectTransform)) + borderSize;
+                    rectTransform.sizeDelta = GetSize(selectedRectTransform);
                     rectTransform.position = GetCenterWorldPosition(selectedRectTransform);
-                    if (image != null)
-                    {
-                        image.color = new Color(image.color.r, image.color.b, image.color.b, opacity);
-                    }
                 }
+            }
+            if (image != null)
+            {
+                image.color = CursorColor;
             }
         }
     }
