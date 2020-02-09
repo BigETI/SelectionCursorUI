@@ -1,0 +1,17 @@
+{
+    "name": "com.bigeti.selection-cursor-ui",
+    "version": "1.0.1",
+    "displayName": "Selection Cursor UI for Unity",
+    "description": "This package contains a selection cursor UI for Unity.",
+    "dependencies": {},
+    "keywords": [
+        "selection",
+        "cursor",
+        "selectioncursor"
+    ],
+    "author": {
+        "name": "Ethem Kurt",
+        "email": "bigeti.ethem@gmail.com",
+        "url": "https://bigeti.de/"
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "name": "SelectionCursorUIEditor",
+    "references": [
+        "GUID:19b093da70a434e43959ca5ed2085e01"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

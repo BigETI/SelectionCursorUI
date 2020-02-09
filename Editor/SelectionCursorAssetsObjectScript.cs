@@ -3,7 +3,7 @@
 /// <summary>
 /// Selection cursor UI editor namespace
 /// </summary>
-namespace SelectionCursorUI.Editor
+namespace SelectionCursorUIEditor
 {
     /// <summary>
     /// Selection cursor assets object script class
